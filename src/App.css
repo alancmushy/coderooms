@@ -68,7 +68,6 @@ body {
   text-align: center;             
 }
 
-
 .titles{
   display: flex;
   flex-direction: column;      
@@ -98,7 +97,30 @@ body {
 #img-terminal{
   flex: 1;
   width: 350px;              
-  height: 350px;
-  
+  height: 350px; 
 }
 
+#code-editor{
+  display:flex;
+  flex-direction:row;
+}
+
+#chat-log{
+  background: white;
+  height:82.5%;
+  width:325px;
+  overflow:auto;
+}
+
+#chat-input{
+  width:290px;
+  height:25px;
+}
+
+#enter-btn{
+  position: relative;
+  top: 5px;
+  height:25px;
+  width:25px;
+
+} 

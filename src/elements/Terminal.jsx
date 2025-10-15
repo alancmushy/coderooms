@@ -37,7 +37,7 @@ const Terminal = ({roomUuid, refBox,lang}) => {
 
   return (
     <div id="termainalandrun-div">
-      <img id="run-btn" src="run.png" width="15" height="15" onClick={run}></img>
+      <img id="run-btn" src="/run.png" width="15" height="15" onClick={run}></img>
       <div id="terminal">
         <p id ="output-code">@coderooms\{lang}\output&gt; {output}</p>
       </div>

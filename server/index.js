@@ -5,8 +5,9 @@ import {v4 as uuidv4} from 'uuid';
 import cors from 'cors';
 const app = express();
 const server = http.createServer(app);
-
 app.use(cors());
+let countByRoom = {}
+let roomCode = {}
 
 const io = new Server(server, {
   cors: {
@@ -21,11 +22,31 @@ app.get('/createRoom',(req,res)=>{
 })
 
 io.on('connection',(socket)=>{
-   console.log('user is online')
-   //for joining a room
+   
    socket.on("join-room", (roomUuid) =>{
+      if(!countByRoom[roomUuid]){
+         countByRoom[roomUuid]=0
+      }
+      if(countByRoom[roomUuid]>=3){
+         console.log("Too many users in one room!")
+         //full room, kicks out sockets that go past threshold of 3 concurent users
+         socket.emit("full-room","Only 3 users allowed concurrently")
+         return;
+      }
+      
       socket.join(roomUuid);
-      console.log(`Socket ${socket.id} joined room ${roomUuid}`);
+
+      //setting up the socket's roomUuid, updating the count of the room, socket's user number, and emitting existent code
+      socket.data.roomUuid = roomUuid
+      countByRoom[roomUuid]++;
+      socket.data.userNum = countByRoom[roomUuid];
+      if(roomCode[roomUuid]){
+         //display previously written code to newly joined socket
+         socket.emit('coding',roomCode[roomUuid]);
+      }
+   
+      console.log(`Socket ${socket.id} has joined room ${socket.data.roomUuid}`);
+      console.log(`${roomUuid} has ${countByRoom[roomUuid]} users online right now`)
    })
    //for when language change occurs between any of the users, emitted to both users concurrently
    socket.on("lang-change",({roomUuid,language}) =>{
@@ -33,16 +54,29 @@ io.on('connection',(socket)=>{
    });
    //for real-time coding updates within the coding space, emitted to both users concurrently
    socket.on('coding', ({roomUuid,code}) => {
+      roomCode[roomUuid] = code;
       socket.to(roomUuid).emit('coding', code);
    })
    //for when code is ran between any of the two users, emitted to both users concurrently
    socket.on('run-code',({roomUuid,terminal}) =>{
       socket.to(roomUuid).emit('run-code',terminal);
    })
-   //for room disconnection
-   socket.on("disconnect", () => {
-      console.log("disconnected")
+   //for side chat box, for users to interact whilst coding
+   socket.on('chat-box',({roomUuid,name, message}) =>{
+      const userNumber = socket.data.userNum
+      socket.data.name = name;
+      socket.to(roomUuid).emit('chat-box',{name, message,userNumber});
    });
+   //for room disconnection
+   socket.on("disconnect", () => { 
+      if(socket.data.name=null){
+         socket.to(socket.data.roomUuid).emit('chat-box',{name:"",message:'A USER HAS LEFT THE ROOM',userNumber:0})
+      }else{
+         socket.to(socket.data.roomUuid).emit('chat-box',{name:socket.data.name,message:' HAS LEFT THE ROOM',userNumber:0})
+      }
+      countByRoom[socket.data.roomUuid]--; 
+      console.log(`${socket.data.roomUuid} has ${countByRoom[socket.data.roomUuid]} users in the room`) 
+   }); 
 });
 
 server.listen(3000,() =>{

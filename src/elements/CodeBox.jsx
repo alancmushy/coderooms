@@ -26,8 +26,6 @@ const CodeBox = ({roomUuid, refBox, lang, setLang}) => {
       socket.emit("lang-change",{roomUuid,language:e.target.value});
    }
    useEffect(()=>{
-        
-        socket.emit('join-room', roomUuid);
         socket.on('coding',(code) =>{
           setValue(code);
         })
@@ -56,7 +54,7 @@ const CodeBox = ({roomUuid, refBox, lang, setLang}) => {
          theme = "vs-dark" 
          language= {lang}
          onMount ={onMount}
-         value = {value} 
+         value = {value || ''} 
          onChange={codeEmit}
          />
          

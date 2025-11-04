@@ -32,7 +32,7 @@ app.get("/{*any}", (req, res) => {
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", 
+    origin: "https://coderooms-28v9.onrender.com", 
     methods: ["GET", "POST"],
   },
 });

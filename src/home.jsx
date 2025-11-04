@@ -6,7 +6,7 @@ import CodeEditor from './CodeEditor';
 const Home = () =>{
   const navigate = useNavigate()
   const createRoom = async () =>{
-    const res = await fetch("http://localhost:3000/createRoom")
+    const res = await fetch("https://coderooms-28v9.onrender.com/createRoom")
     const data = await res.json();
     navigate(`/room/${data.roomUuid}`)
   }

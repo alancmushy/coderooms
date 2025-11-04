@@ -1,13 +1,34 @@
 import express from 'express';
 import http from 'http';
+import path from "path";
 import {Server} from 'socket.io';
 import {v4 as uuidv4} from 'uuid';
 import cors from 'cors';
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const app = express();
 const server = http.createServer(app);
+
 app.use(cors());
+
+
 let countByRoom = {}
 let roomCode = {}
+
+app.use(express.static(path.join(__dirname, "dist")));
+
+
+app.get('/createRoom',(req,res)=>{
+   const roomUuid = uuidv4()
+   res.send({ roomUuid })
+})
+
+
+app.get("/{*any}", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "dist", "index.html"));
+});
 
 const io = new Server(server, {
   cors: {
@@ -15,11 +36,6 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
-
-app.get('/createRoom',(req,res)=>{
-   const roomUuid = uuidv4()
-   res.send({ roomUuid })
-})
 
 io.on('connection',(socket)=>{
    
@@ -69,11 +85,7 @@ io.on('connection',(socket)=>{
    });
    //for room disconnection
    socket.on("disconnect", () => { 
-      if(socket.data.name=null){
-         socket.to(socket.data.roomUuid).emit('chat-box',{name:"",message:'A USER HAS LEFT THE ROOM',userNumber:0})
-      }else{
-         socket.to(socket.data.roomUuid).emit('chat-box',{name:socket.data.name,message:' HAS LEFT THE ROOM',userNumber:0})
-      }
+      socket.to(socket.data.roomUuid).emit('chat-box',{name:socket.data.name,message:' HAS LEFT THE ROOM',userNumber:0})
       countByRoom[socket.data.roomUuid]--; 
       console.log(`${socket.data.roomUuid} has ${countByRoom[socket.data.roomUuid]} users in the room`) 
    }); 

@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "server": "node index.js",
+    "start":"npm run build && npm run server"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

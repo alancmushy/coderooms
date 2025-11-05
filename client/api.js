@@ -1,5 +1,5 @@
 import axios from "axios";
-import { LANGUAGES } from "./elements/codebox";
+import { LANGUAGES } from "./elements/CodeBox";
 const API = axios.create({
    baseURL:"https://emkc.org/api/v2/piston"
 })

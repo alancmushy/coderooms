@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import './app.css'
-import CodeBox from './elements/codeBox';
+import CodeBox from './elements/codebox';
 import Terminal from './elements/Terminal';
 import socket from './elements/socket';
 
